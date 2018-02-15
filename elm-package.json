@@ -4,7 +4,7 @@
     "repository": "https://github.com/spsjvc/elm-todo-list.git",
     "license": "MIT",
     "source-directories": [
-        "."
+        "src"
     ],
     "exposed-modules": [],
     "dependencies": {
