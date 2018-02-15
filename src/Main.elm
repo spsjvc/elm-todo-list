@@ -19,6 +19,7 @@ main =
 type alias Todo =
     { id : Int
     , name : String
+    , priority : Int
     , isCompleted : Bool
     }
 
@@ -34,6 +35,7 @@ type Msg
     = Add
     | Remove Todo
     | Toggle Todo
+    | ChangePriority Todo
     | Change String
 
 
@@ -53,6 +55,7 @@ update msg model =
                 | todos =
                     { id = model.idCount
                     , name = model.inputContent
+                    , priority = 0
                     , isCompleted = False
                     }
                         :: model.todos
@@ -62,6 +65,25 @@ update msg model =
 
         Remove todo ->
             { model | todos = List.filter (\t -> t.id /= todo.id) model.todos }
+
+        ChangePriority todo ->
+            { model
+                | todos =
+                    List.map
+                        (\t ->
+                            { t
+                                | priority =
+                                    if t.id == todo.id then
+                                        if t.priority == 2 then
+                                            0
+                                        else
+                                            t.priority + 1
+                                    else
+                                        t.priority
+                            }
+                        )
+                        model.todos
+            }
 
         Toggle todo ->
             { model
@@ -85,18 +107,30 @@ update msg model =
 
 renderTodo : Todo -> Html Msg
 renderTodo todo =
-    li [ onClick (Toggle todo) ]
+    li [ onClick (ChangePriority todo) ]
         [ (if todo.isCompleted then
             todo.name
+                ++ ", priority: "
+                ++ toString todo.priority
                 |> Text.fromString
                 |> Text.line Text.Through
            else
             todo.name
+                ++ ", priority: "
+                ++ toString todo.priority
                 |> Text.fromString
           )
             |> Element.leftAligned
             |> Element.toHtml
-        , button [ onClick (Remove todo) ] [ text "X" ]
+        , button [ onClick (Remove todo) ] [ text "Delete" ]
+        , button [ onClick (Toggle todo) ]
+            [ text
+                (if todo.isCompleted then
+                    "✘"
+                 else
+                    "✓"
+                )
+            ]
         ]
 
 
@@ -109,7 +143,8 @@ view model =
             ]
         ]
         [ h1 [] [ text "Todo list: " ]
-        , ul [] (List.map (\todo -> renderTodo todo) model.todos)
+        , button [ onClick Add ] [ text "Add" ]
+        , br [] []
         , input
             [ placeholder "Write your new todo"
             , onInput Change
@@ -117,6 +152,5 @@ view model =
             , style [ ( "width", "150px" ) ]
             ]
             []
-        , br [] []
-        , button [ onClick Add ] [ text "Add" ]
+        , ul [] (List.map (\todo -> renderTodo todo) model.todos)
         ]
