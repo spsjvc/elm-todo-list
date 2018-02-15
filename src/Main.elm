@@ -117,6 +117,7 @@ renderTodo todo =
                 else
                     "black"
               )
+            , ( "padding", "5px 0 5px 0" )
             ]
         ]
         [ div [ onClick (ChangePriority todo) ]
