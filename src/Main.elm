@@ -107,21 +107,30 @@ update msg model =
 
 renderTodo : Todo -> Html Msg
 renderTodo todo =
-    li [ onClick (ChangePriority todo) ]
-        [ (if todo.isCompleted then
-            todo.name
-                ++ ", priority: "
-                ++ toString todo.priority
-                |> Text.fromString
-                |> Text.line Text.Through
-           else
-            todo.name
-                ++ ", priority: "
-                ++ toString todo.priority
-                |> Text.fromString
-          )
-            |> Element.leftAligned
-            |> Element.toHtml
+    li
+        [ style
+            [ ( "color"
+              , if todo.priority == 1 then
+                    "orange"
+                else if todo.priority == 2 then
+                    "red"
+                else
+                    "black"
+              )
+            ]
+        ]
+        [ div [ onClick (ChangePriority todo) ]
+            [ (if todo.isCompleted then
+                todo.name
+                    |> Text.fromString
+                    |> Text.line Text.Through
+               else
+                todo.name
+                    |> Text.fromString
+              )
+                |> Element.leftAligned
+                |> Element.toHtml
+            ]
         , button [ onClick (Remove todo) ] [ text "Delete" ]
         , button [ onClick (Toggle todo) ]
             [ text
@@ -143,8 +152,6 @@ view model =
             ]
         ]
         [ h1 [] [ text "Todo list: " ]
-        , button [ onClick Add ] [ text "Add" ]
-        , br [] []
         , input
             [ placeholder "Write your new todo"
             , onInput Change
@@ -152,5 +159,6 @@ view model =
             , style [ ( "width", "150px" ) ]
             ]
             []
+        , button [ onClick Add ] [ text "Add" ]
         , ul [] (List.map (\todo -> renderTodo todo) model.todos)
         ]
